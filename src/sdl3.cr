@@ -7,6 +7,7 @@ module Sdl3
   alias PixelFormat = LibSdl3::PixelFormat
   alias ScaleMode   = LibSdl3::ScaleMode
   alias FlipMode    = LibSdl3::FlipMode
+  alias Scancode    = LibSdl3::Scancode
   alias Keycode     = LibSdl3::Keycode
   alias Keymod      = LibSdl3::Keymod
 
