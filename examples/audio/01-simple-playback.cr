@@ -16,9 +16,8 @@ Sdl3.init(Sdl3::InitFlags::Video | Sdl3::InitFlags::Audio) do
   stream.resume
 
   loop do
-    LibSdl3.poll_event(out event)
-    case event.type
-    when LibSdl3::EventType::Quit
+    case Sdl3::Events.poll
+    when Sdl3::Event::Quit
       break
     end
 
