@@ -10,10 +10,10 @@ module Sdl3
     end
 
     def self.copy(source : LibSdl3::PropertiesID, destination : LibSdl3::PropertiesID)
-      LibSdl3.copy_properties(source, destination)
+      Sdl3.raise_error unless LibSdl3.copy_properties(source, destination)
     end
 
-    @id : LibSdl3::PropertiesID
+    getter id : LibSdl3::PropertiesID
 
     def initialize
       @id = LibSdl3.create_properties
@@ -27,11 +27,11 @@ module Sdl3
     end
 
     def lock
-      LibSdl3.lock_properties(@id)
+      Sdl3.raise_error unless LibSdl3.lock_properties(@id)
     end
 
     def unlock
-      LibSdl3.unlock_properties(@id)
+      Sdl3.raise_error unless LibSdl3.unlock_properties(@id)
     end
 
     def type(name)

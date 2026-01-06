@@ -18,8 +18,8 @@ module Sdl3
       LibSdl3.destroy_surface(self)
     end
 
-    def properties_id
-      LibSdl3.get_surface_properties(self)
+    def properties
+      Properties.new(LibSdl3.get_surface_properties(self))
     end
 
     # fun set_surface_colorspace = SDL_SetSurfaceColorspace(surface : Surface*, colorspace : Colorspace) : Bool

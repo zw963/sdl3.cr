@@ -18,7 +18,7 @@ module Sdl3
     end
 
     def properties
-      @properties ||= Properties.new(LibSdl3.get_texture_properties(@pointer))
+      Properties.new(LibSdl3.get_texture_properties(self))
     end
 
     def renderer

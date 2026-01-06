@@ -34,6 +34,10 @@ module Sdl3
       LibSdl3.destroy_renderer(@pointer)
     end
 
+    def properties
+      Properties.new(LibSdl3.get_renderer_properties(self))
+    end
+
     def logical_presentation=(presentation : Tuple(Int32, Int32, LogicalPresentation))
       w, h, p = presentation
       LibSdl3.set_render_logical_presentation(@pointer, w, h, p)
