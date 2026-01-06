@@ -23,6 +23,18 @@ module Sdl3
       @renderer ||= Renderer.new(self, name)
     end
 
+    def id
+      LibSdl3.get_window_id(@pointer)
+    end
+
+    def popup(offset_x, offset_y, width, height, flags : Flags = Flags::None)
+      LibSdl3.create_popup_window(self, offset_x, offset_y, width, height, flags)
+    end
+
+    def always_on_top=(value : Bool)
+      LibSdl3.set_window_always_on_top(self, value ? 1 : 0)
+    end
+
     def title
       String.new(LibSdl3.get_window_title(self))
     end
