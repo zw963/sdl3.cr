@@ -5,7 +5,7 @@ module Sdl3
     def initialize(@pointer, @owned = true)
     end
 
-    def initialize(renderer : Renderer, format : LibSdl3::PixelFormat, access : Access, width : Int32, height : Int32)
+    def initialize(renderer : Renderer, format : PixelFormat, access : Access, width : Int32, height : Int32)
       @pointer = LibSdl3.create_texture(renderer, format, access, width, height)
     end
 
@@ -48,7 +48,7 @@ module Sdl3
     # fun get_texture_blend_mode = SDL_GetTextureBlendMode(texture : Texture*, blend_mode : BlendMode*) : Bool
 
     # fun set_texture_scale_mode = SDL_SetTextureScaleMode(texture : Texture*, scale_mode : ScaleMode) : Bool
-    def scale_mode=(scale_mode : Sdl3::ScaleMode)
+    def scale_mode=(scale_mode : ScaleMode)
       result = LibSdl3.set_texture_scale_mode(self, scale_mode)
       Sdl3.raise_error unless result
     end
@@ -59,7 +59,7 @@ module Sdl3
       Sdl3.raise_error unless result
     end
 
-    def update(rect : LibSdl3::Rect*?, pixels, pitch)
+    def update(rect : Rect*?, pixels, pitch)
       updated = LibSdl3.update_texture(self, rect, pixels, pitch)
       Sdl3.raise_error unless updated
     end
@@ -67,20 +67,35 @@ module Sdl3
     # fun updateyuv_texture = SDL_UpdateYUVTexture(texture : Texture*, rect : Rect*, yplane : UInt8*, ypitch : Int, uplane : UInt8*, upitch : Int, vplane : UInt8*, vpitch : Int) : Bool
     # fun updatenv_texture = SDL_UpdateNVTexture(texture : Texture*, rect : Rect*, yplane : UInt8*, ypitch : Int, u_vplane : UInt8*, u_vpitch : Int) : Bool
 
-    def lock(rect : LibSdl3::Rect*? = nil) : Tuple(Slice(UInt8), Int32)
-      width, height = self.size
+    def unsafe_lock(rect : LibSdl3::Rect*? = nil) : Tuple(Pointer(Void), Int32)
       locked = LibSdl3.lock_texture(self, rect, out pixels_pointer, out pitch)
       Sdl3.raise_error unless locked
-      {Slice.new(pixels_pointer.as(UInt8*), height.to_i32 * pitch), pitch}
+      {pixels_pointer, pitch}
+    end
+
+    def lock(rect : Rect*? = nil) : Tuple(Slice(UInt8), Int32)
+      r = rect || begin
+                    w, h = size
+                    Rect.new(x: 0, y: 0, w: w, h: h)
+                  end
+      locked = LibSdl3.lock_texture(self, pointerof(r), out pixels_pointer, out pitch)
+      Sdl3.raise_error unless locked
+      {Slice.new(pixels_pointer.as(UInt8*), r.h.to_i32 * pitch), pitch}
     end
 
     def unlock
       LibSdl3.unlock_texture(self)
     end
 
+    def unsafe_lock(rect : LibSdl3::Rect*? = nil, & : Pointer(Void), Int32 ->)
+      yield(*unsafe_lock(rect))
+    ensure
+      unlock
+    end
+
     def lock(rect : LibSdl3::Rect*? = nil, & : Slice(UInt8), Int32 ->)
-      pixels, pitch = lock(rect)
-      yield(pixels, pitch)
+      yield(*lock(rect))
+    ensure
       unlock
     end
 
