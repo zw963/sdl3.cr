@@ -1,5 +1,5 @@
 module Sdl3
-  class Renderer
+  class Renderer < SdlObject(LibSdl3::Renderer*)
     alias LogicalPresentation = LibSdl3::RendererLogicalPresentation
 
     def self.num_drivers
@@ -8,11 +8,6 @@ module Sdl3
 
     def self.driver(index)
       String.new(LibSdl3.get_render_driver(index))
-    end
-
-    @pointer : LibSdl3::Renderer*
-
-    def initialize(@pointer)
     end
 
     def initialize(window : LibSdl3::Window* | Window, name : String? = nil)
@@ -35,11 +30,7 @@ module Sdl3
       Sdl3.raise_error unless @pointer
     end
 
-    def to_unsafe
-      @pointer
-    end
-
-    def finalize
+    def sdl_finalize
       LibSdl3.destroy_renderer(@pointer)
     end
 
@@ -311,8 +302,15 @@ module Sdl3
     # LibSdl3.get_render_metal_layer(@pointer) : Void*
     # LibSdl3.get_render_metal_command_encoder(@pointer) : Void*
     # LibSdl3.add_vulkan_render_semaphores(@pointer, wait_stage_mask : UInt32, wait_semaphore : Int64, signal_semaphore : Int64) : Bool
-    # LibSdl3.set_render_v_sync(@pointer, vsync : Int) : Bool
-    # LibSdl3.get_render_v_sync(@pointer, vsync : Int*) : Bool
+
+    def vsync=(value : Bool)
+      Sdl3.raise_error unless LibSdl3.set_render_v_sync(@pointer, value ? 1 : 0)
+    end
+
+    def vsync?
+      Sdl3.raise_error unless LibSdl3.get_render_v_sync(@pointer, out vsync)
+      vsync > 0 ? true : false
+    end
 
     def debug_text(x : Float32, y : Float32, string : String)
       Sdl3.raise_error unless LibSdl3.render_debug_text(@pointer, x, y, string)
