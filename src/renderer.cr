@@ -90,6 +90,10 @@ module Sdl3
       LibSdl3.render_rects(@pointer, rects, count)
     end
 
+    def render_rects(rects : Enumerable(FRect))
+      LibSdl3.render_rects(@pointer, rects, rects.size)
+    end
+
     def render_line(x1 : Float32, y1 : Float32, x2 : Float32, y2 : Float32)
       LibSdl3.render_line(@pointer, x1, y1, x2, y2)
     end
@@ -98,7 +102,7 @@ module Sdl3
       LibSdl3.render_lines(@pointer, pointerof(points).as(Pointer(LibSdl3::FPoint)), points.size)
     end
 
-    def render_lines(points : Enumerable(LibSdl3::FPoint))
+    def render_lines(points : Enumerable(FPoint))
       LibSdl3.render_lines(@pointer, points, points.size)
     end
 
@@ -195,8 +199,8 @@ module Sdl3
       LibSdl3.convert_event_to_render_coordinates(@pointer, event)
     end
 
-    def viewport=(rect : Rect*)
-      LibSdl3.set_render_viewport(@pointer, rect)
+    def viewport=(rect : Rect)
+      LibSdl3.set_render_viewport(@pointer, pointerof(rect))
     end
 
     def viewport
@@ -213,8 +217,8 @@ module Sdl3
       rect
     end
 
-    def clip_rect=(rect : Rect*)
-      LibSdl3.set_render_clip_rect(@pointer, rect)
+    def clip_rect=(rect : Rect)
+      LibSdl3.set_render_clip_rect(@pointer, pointerof(rect))
     end
 
     def clip_rect
@@ -264,28 +268,25 @@ module Sdl3
       blend_mode
     end
 
-    def render_texture(texture : Texture, source_rect : FRect, dest_rect : FRect)
-      LibSdl3.render_texture(@pointer, texture, pointerof(source_rect), pointerof(dest_rect))
+    def render_texture(texture : Texture, source_rect : FRect? = nil, dest_rect : FRect? = nil)
+      sr = source_rect.try { |sr| pointerof(sr) } || Pointer(FRect).null
+      dr = dest_rect.try { |dr| pointerof(dr) } || Pointer(FRect).null
+      LibSdl3.render_texture(@pointer, texture, sr, dr)
     end
 
-    def render_texture(texture : Texture)
-      LibSdl3.render_texture(@pointer, texture, nil, nil)
-    end
-
-    def render_texture(texture : Texture, source_rect : FRect)
-      LibSdl3.render_texture(@pointer, texture, pointerof(source_rect), nil)
-    end
-
-    def render_texture(texture : Texture, n : Nil, dest_rect : FRect)
-      LibSdl3.render_texture(@pointer, texture, nil, pointerof(dest_rect))
-    end
-
-    def render_texture_rotated(texture : Texture, source_rect : FRect*? = nil, dest_rect : FRect*? = nil, angle : Float64 = 0.0, center : FPoint*? = nil, flip : FlipMode = FlipMode::None)
+    def render_texture_rotated(texture : Texture, source_rect : FRect? = nil, dest_rect : FRect? = nil, angle : Float64 = 0.0, center : FPoint? = nil, flip : FlipMode = FlipMode::None)
+      sr = source_rect.try { |sr| pointerof(sr) } || Pointer(FRect).null
+      dr = dest_rect.try { |dr| pointerof(dr) } || Pointer(FRect).null
+      c = center.try { |c| pointerof(c) } || Pointer(FPoint).null
       Sdl3.raise_error unless LibSdl3.render_texture_rotated(@pointer, texture, source_rect, dest_rect, angle, center, flip)
     end
 
-    def render_texture_affine(texture : Texture, source_rect : FRect*? = nil, dest_rect : FRect*? = nil, angle : Float64 = 0.0, center : FPoint*? = nil, flip : FlipMode = FlipMode::None)
-      Sdl3.raise_error unless LibSdl3.render_texture_affine(@pointer, texture, source_rect, dest_rect, angle, center, flip)
+    def render_texture_affine(texture : Texture, source_rect : FRect? = nil, origin : FPoint? = nil, right : FPoint? = nil, down : FPoint? = nil)
+      sr = source_rect.try { |sr| pointerof(sr) } || Pointer(FRect).null
+      o = origin.try { |o| pointerof(o) } || Pointer(FPoint).null
+      r = right.try { |r| pointerof(r) } || Pointer(FPoint).null
+      d = down.try { |d| pointerof(d) } || Pointer(FPoint).null
+      Sdl3.raise_error unless LibSdl3.render_texture_affine(@pointer, texture, source_rect, o, r, d)
     end
 
     # LibSdl3.render_texture_tiled(@pointer, texture : Texture*, srcrect : FRect*, scale : Float32, dstrect : FRect*) : Bool
