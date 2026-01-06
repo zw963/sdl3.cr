@@ -1,5 +1,5 @@
-require "./src/sdl3"
-require "./src/ttf.cr"
+require "../../src/sdl3"
+require "../../src/ttf"
 
 WIDTH = 640
 HEIGHT = 480
@@ -10,6 +10,7 @@ Sdl3.init(Sdl3::InitFlags::Video) do
   window = Sdl3::Window.new("TTF Hello World", WIDTH, HEIGHT, Sdl3::Window::Flags::None)
   renderer = window.create_renderer
   renderer.logical_presentation = {WIDTH, HEIGHT, LibSdl3::RendererLogicalPresentation::Letterbox}
+  renderer.draw_color = { 50u8, 50u8, 100u8, 255u8 }
 
   font = Sdl3::TTF::Font.open("/System/Library/Fonts/NewYorkItalic.ttf", 72)
   # font = Sdl3::TTF::Font.open("/System/Library/Fonts/Palatino.ttc", 72)
@@ -34,27 +35,29 @@ Sdl3.init(Sdl3::InitFlags::Video) do
       break
     end
 
+    renderer.clear
+
     renderer.render_texture(
       tlcd,
-      Sdl3::FRect.new(x: 0, y: 0, w: lcd.width, h: lcd.height),
+      nil,
       Sdl3::FRect.new(x: 0, y: 0, w: lcd.width, h: lcd.height)
     )
 
     renderer.render_texture(
       tsolid,
-      Sdl3::FRect.new(x: 0, y: 0, w: solid.width, h: solid.height),
+      nil,
       Sdl3::FRect.new(x: 0, y: lcd.height, w: solid.width, h: solid.height)
     )
 
     renderer.render_texture(
       tblended,
-      Sdl3::FRect.new(x: 0, y: 0, w: blended.width, h: blended.height),
+      nil,
       Sdl3::FRect.new(x: 0, y: lcd.height * 2, w: blended.width, h: blended.height)
     )
 
     renderer.render_texture(
       tshaded,
-      Sdl3::FRect.new(x: 0, y: 0, w: shaded.width, h: shaded.height),
+      nil,
       Sdl3::FRect.new(x: 0, y: lcd.height * 3, w: shaded.width, h: shaded.height)
     )
 

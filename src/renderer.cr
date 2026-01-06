@@ -74,19 +74,19 @@ module Sdl3
       LibSdl3.render_points(@pointer, points, points.size)
     end
 
-    def render_points(points : LibSdl3::FPoint*, size : Int32)
+    def render_points(points : FPoint*, size : Int32)
       LibSdl3.render_points(@pointer, points, size)
     end
 
-    def fill_rect(rect : LibSdl3::FRect)
-      LibSdl3.render_fill_rect(@pointer, pointerof(rect))
+    def fill_rect(rect : FRect*)
+      LibSdl3.render_fill_rect(@pointer, rect)
     end
 
-    def render_rect(rect : LibSdl3::FRect)
-      LibSdl3.render_rect(@pointer, pointerof(rect))
+    def render_rect(rect : FRect*)
+      LibSdl3.render_rect(@pointer, rect)
     end
 
-    def render_rects(rects : LibSdl3::FRect*, count : Int32)
+    def render_rects(rects : FRect*, count : Int32)
       LibSdl3.render_rects(@pointer, rects, count)
     end
 
@@ -195,7 +195,7 @@ module Sdl3
       LibSdl3.convert_event_to_render_coordinates(@pointer, event)
     end
 
-    def viewport=(rect : Rect)
+    def viewport=(rect : Rect*)
       LibSdl3.set_render_viewport(@pointer, rect)
     end
 
@@ -213,7 +213,7 @@ module Sdl3
       rect
     end
 
-    def clip_rect=(rect : Rect)
+    def clip_rect=(rect : Rect*)
       LibSdl3.set_render_clip_rect(@pointer, rect)
     end
 
@@ -264,15 +264,27 @@ module Sdl3
       blend_mode
     end
 
-    def render_texture(texture : Texture, source_rect : LibSdl3::FRect? = nil, dest_rect : LibSdl3::FRect? = nil)
+    def render_texture(texture : Texture, source_rect : FRect, dest_rect : FRect)
       LibSdl3.render_texture(@pointer, texture, pointerof(source_rect), pointerof(dest_rect))
     end
 
-    def render_texture_rotated(texture : Texture, source_rect : LibSdl3::FRect? = nil, dest_rect : LibSdl3::FRect? = nil, angle : Float64 = 0.0, center : LibSdl3::FPoint? = nil, flip : FlipMode = FlipMode::None)
+    def render_texture(texture : Texture)
+      LibSdl3.render_texture(@pointer, texture, nil, nil)
+    end
+
+    def render_texture(texture : Texture, source_rect : FRect)
+      LibSdl3.render_texture(@pointer, texture, pointerof(source_rect), nil)
+    end
+
+    def render_texture(texture : Texture, n : Nil, dest_rect : FRect)
+      LibSdl3.render_texture(@pointer, texture, nil, pointerof(dest_rect))
+    end
+
+    def render_texture_rotated(texture : Texture, source_rect : FRect*? = nil, dest_rect : FRect*? = nil, angle : Float64 = 0.0, center : FPoint*? = nil, flip : FlipMode = FlipMode::None)
       Sdl3.raise_error unless LibSdl3.render_texture_rotated(@pointer, texture, source_rect, dest_rect, angle, center, flip)
     end
 
-    def render_texture_affine(texture : Texture, source_rect : LibSdl3::FRect? = nil, dest_rect : LibSdl3::FRect? = nil, angle : Float64 = 0.0, center : LibSdl3::FPoint? = nil, flip : FlipMode = FlipMode::None)
+    def render_texture_affine(texture : Texture, source_rect : FRect*? = nil, dest_rect : FRect*? = nil, angle : Float64 = 0.0, center : FPoint*? = nil, flip : FlipMode = FlipMode::None)
       Sdl3.raise_error unless LibSdl3.render_texture_affine(@pointer, texture, source_rect, dest_rect, angle, center, flip)
     end
 
@@ -284,7 +296,7 @@ module Sdl3
     # LibSdl3.set_render_texture_address_mode(@pointer, u_mode : TextureAddressMode, v_mode : TextureAddressMode) : Bool
     # LibSdl3.get_render_texture_address_mode(@pointer, u_mode : TextureAddressMode*, v_mode : TextureAddressMode*) : Bool
 
-    def read_pixels(rect : LibSdl3::Rect? = nil)
+    def read_pixels(rect : Rect*? = nil)
       Surface.new(LibSdl3.render_read_pixels(@pointer, rect))
     end
 
