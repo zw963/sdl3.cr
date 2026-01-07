@@ -1,6 +1,8 @@
 module Sdl3
   module TTF
     class Font < SdlObject(LibSdl3TTF::Font*)
+      alias Hinting = LibSdl3TTF::HintingFlags
+
       @[Flags]
       enum Style : LibSdl3TTF::FontStyleFlags
         Normal        = LibSdl3TTF::STYLE_NORMAL
@@ -38,6 +40,60 @@ module Sdl3
 
       def outline
         LibSdl3TTF.get_font_outline(self)
+      end
+
+      def hinting=(flags : Hinting)
+        LibSdl3TTF.set_font_hinting(self, flags)
+      end
+
+      def hinting
+        LibSdl3TTF.get_font_hinting(self)
+      end
+
+      # TTF_GetFontWeight
+      def weight
+        LibSdl3TTF.get_font_weight(self)
+      end
+
+      # TTF_GetFontGeneration
+      def generation
+        LibSdl3TTF.get_font_generation(self)
+      end
+
+      # TTF_AddFallbackFont
+      def add_fallback(font : Font)
+        Sdl3.raise_error unless LibSdl3TTF.add_fallback_font(self, font)
+      end
+
+      # TTF_RemoveFallbackFont
+      def remove_fallback(font : Font)
+        LibSdl3TTF.remove_fallback_font(self, font)
+      end
+
+      # TTF_ClearFallbackFonts
+      def clear_fallbacks
+        LibSdl3TTF.clear_fallback_fonts(self)
+      end
+
+      # TTF_SetFontSize
+      def size=(points : Float32)
+        Sdl3.raise_error unless LibSdl3TTF.set_font_size(self, points)
+      end
+
+      # TTF_GetFontSize
+      def size
+        LibSdl3TTF.get_font_size(self)
+      end
+
+      # TTF_SetFontSizeDPI
+      def set_dpi(points : Float32, hdpi : Int32, vdpi : Int32)
+        Sdl3.raise_error unless LibSdl3TTF.set_font_size_dpi(self, points, hdpi, vdpi)
+      end
+
+      # https://wiki.libsdl.org/SDL3_ttf/TTF_GetFontDPI
+      def dpi
+        Sdl3.raise_error unless LibSdl3TTF.get_font_dpi(self, out hdpi, out vdpi)
+        {hdpi, vdpi}
       end
 
       def render_text_solid(text : String, fg : Color)
